@@ -1,6 +1,6 @@
 ---
 name: ozon-api
-description: Use whenever the user wants to interact with Ozon as a seller — managing product cards (загрузка товаров, атрибуты, категории), prices and stocks (цены и остатки), FBS/rFBS/FBO orders and postings (отправления, сборка, маркировка), supply requests (заявки на поставку FBO), returns (возвраты), promotions (акции), pricing strategies, reports, finance, analytics, seller rating, chats, reviews (отзывы), questions, warehouses — or with Ozon advertising via the Performance API (реклама: кампании, трафареты, оплата за клик/заказ, продвижение в поиске, ставки, рекламная статистика). Trigger on phrases like "Ozon API", "озон апи", "Seller API", "Performance API", "товары на озоне", "отправления озон", "поставка FBO", "остатки на озоне", "акции озон", "реклама на озоне", "рекламные кампании озон", or any URL under api-seller.ozon.ru, api-performance.ozon.ru, or docs.ozon.ru/api. The skill bundles both full official OpenAPI 3.0 specs (Seller: 460 endpoints; Performance: 48 endpoints) and a lookup tool — use it instead of guessing paths or schemas, even for endpoints that look obvious.
+description: Use when the user works with Ozon as a seller or advertiser via API — товары, цены, остатки, отправления FBS/rFBS/FBO, поставки, возвраты, акции, отчёты, финансы, отзывы, чаты, or ad campaigns/statistics/bids (Performance API). Triggers: "Ozon API", "озон апи", "Seller API", "реклама на озоне", api-seller.ozon.ru, api-performance.ozon.ru, docs.ozon.ru/api.
 ---
 
 # Ozon Seller API + Performance API
