@@ -1,33 +1,44 @@
 #!/usr/bin/env python3
-"""Extract details for Ozon Seller API endpoints from the bundled OpenAPI spec.
+"""Extract details for Ozon Seller/Performance API endpoints from the bundled OpenAPI specs.
 
-The full spec is several MB — too big to dump into context. This script lets
-you pull only what you need: the operation object, its parameters,
-request/response schemas (with $ref resolved one level), and deprecation flags.
+The full specs are too big to dump into context. This script lets you pull
+only what you need: the operation object, its parameters, request/response
+schemas (with $ref resolved one level), and deprecation flags.
+
+Two bundled specs (default is the Seller API; pass --api performance for ads):
+    seller       — api-seller.ozon.ru (товары, заказы, отчёты, ...)
+    performance  — api-performance.ozon.ru (реклама: кампании, статистика, ставки)
 
 Usage:
     # Search for endpoints by keyword in path/summary/tag (case-insensitive):
     python3 lookup_endpoint.py search цены
     python3 lookup_endpoint.py search /product/info
     python3 lookup_endpoint.py search --tag FBS
+    python3 lookup_endpoint.py search статистика --api performance
 
     # Show full details for a specific path (and optionally method):
     python3 lookup_endpoint.py show /v3/product/info/list
     python3 lookup_endpoint.py show /v2/posting/fbs/get --method post
+    python3 lookup_endpoint.py show /api/client/campaign --api performance
 
     # List all categories (tags) with endpoint counts:
     python3 lookup_endpoint.py tags
+    python3 lookup_endpoint.py tags --api performance
 """
 import argparse
 import json
 import sys
 from pathlib import Path
 
-SPEC_PATH = Path(__file__).resolve().parent.parent / "references" / "ozon-seller-openapi.json"
+REFS_DIR = Path(__file__).resolve().parent.parent / "references"
+SPEC_FILES = {
+    "seller": "ozon-seller-openapi.json",
+    "performance": "ozon-performance-openapi.json",
+}
 
 
-def load_spec() -> dict:
-    with SPEC_PATH.open() as f:
+def load_spec(api: str) -> dict:
+    with (REFS_DIR / SPEC_FILES[api]).open() as f:
         return json.load(f)
 
 
@@ -147,6 +158,22 @@ def cmd_show(spec: dict, args) -> int:
     return 0
 
 
+def cmd_tag_info(spec: dict, args) -> int:
+    """Print the prose description of a tag (doc-only tags like Limits/Token included)."""
+    needle = args.name.lower()
+    matches = [t for t in spec.get("tags", []) if needle in t.get("name", "").lower()
+               or needle in (t.get("x-displayName") or "").lower()]
+    if not matches:
+        names = ", ".join(t.get("name", "?") for t in spec.get("tags", []))
+        print(f"tag not found: {args.name}\navailable: {names}", file=sys.stderr)
+        return 2
+    for t in matches:
+        print(f"# {t.get('name')} — {t.get('x-displayName') or ''}\n")
+        print((t.get("description") or "(no description)").strip())
+        print()
+    return 0
+
+
 def cmd_tags(spec: dict, args) -> int:
     counts = {}
     for path, methods in spec["paths"].items():
@@ -162,28 +189,38 @@ def cmd_tags(spec: dict, args) -> int:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Look up Ozon Seller API endpoints from the bundled OpenAPI spec.")
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument("--api", choices=list(SPEC_FILES), default="seller",
+                        help="which bundled spec to use (default: seller)")
+
+    parser = argparse.ArgumentParser(description="Look up Ozon Seller/Performance API endpoints from the bundled OpenAPI specs.")
     sub = parser.add_subparsers(dest="cmd", required=True)
 
-    p_search = sub.add_parser("search", help="search endpoints by keyword in path/summary/tag")
+    p_search = sub.add_parser("search", parents=[common], help="search endpoints by keyword in path/summary/tag")
     p_search.add_argument("query", nargs="?", default="")
     p_search.add_argument("--tag", help="filter by tag (substring, case-insensitive)")
     p_search.add_argument("--exact", action="store_true", help="disable Russian-stem fallback")
 
-    p_show = sub.add_parser("show", help="show full details of an endpoint")
+    p_show = sub.add_parser("show", parents=[common], help="show full details of an endpoint")
     p_show.add_argument("path", help="exact path or unique substring, e.g. /v3/product/info/list")
     p_show.add_argument("--method", help="get/post/put/delete/patch (default: all defined for this path)")
 
-    sub.add_parser("tags", help="list all sections with endpoint counts")
+    sub.add_parser("tags", parents=[common], help="list all sections with endpoint counts")
+
+    p_tag_info = sub.add_parser("tag-info", parents=[common],
+                                help="print a tag's prose description (incl. doc-only tags: Auth, Limits, Token, Environment)")
+    p_tag_info.add_argument("name", help="tag name or display-name substring, e.g. Limits, Token, Авторизация")
 
     args = parser.parse_args()
-    spec = load_spec()
+    spec = load_spec(args.api)
     if args.cmd == "search":
         return cmd_search(spec, args)
     if args.cmd == "show":
         return cmd_show(spec, args)
     if args.cmd == "tags":
         return cmd_tags(spec, args)
+    if args.cmd == "tag-info":
+        return cmd_tag_info(spec, args)
     return 0
 
 

@@ -1,13 +1,16 @@
 ---
 name: ozon-api
-description: Use whenever the user wants to interact with Ozon as a seller — managing product cards (загрузка товаров, атрибуты, категории), prices and stocks (цены и остатки), FBS/rFBS/FBO orders and postings (отправления, сборка, маркировка), supply requests (заявки на поставку FBO), returns (возвраты), promotions (акции), pricing strategies, reports, finance, analytics, seller rating, chats, reviews (отзывы), questions, warehouses, or any other Ozon Seller API endpoint. Trigger on phrases like "Ozon API", "озон апи", "Seller API", "товары на озоне", "отправления озон", "поставка FBO", "остатки на озоне", "акции озон", or any URL under api-seller.ozon.ru or docs.ozon.ru/api/seller. The skill bundles the full official OpenAPI 3.0 spec (460 endpoints, ~55 sections) and a lookup tool — use it instead of guessing paths or schemas, even for endpoints that look obvious.
+description: Use whenever the user wants to interact with Ozon as a seller — managing product cards (загрузка товаров, атрибуты, категории), prices and stocks (цены и остатки), FBS/rFBS/FBO orders and postings (отправления, сборка, маркировка), supply requests (заявки на поставку FBO), returns (возвраты), promotions (акции), pricing strategies, reports, finance, analytics, seller rating, chats, reviews (отзывы), questions, warehouses — or with Ozon advertising via the Performance API (реклама: кампании, трафареты, оплата за клик/заказ, продвижение в поиске, ставки, рекламная статистика). Trigger on phrases like "Ozon API", "озон апи", "Seller API", "Performance API", "товары на озоне", "отправления озон", "поставка FBO", "остатки на озоне", "акции озон", "реклама на озоне", "рекламные кампании озон", or any URL under api-seller.ozon.ru, api-performance.ozon.ru, or docs.ozon.ru/api. The skill bundles both full official OpenAPI 3.0 specs (Seller: 460 endpoints; Performance: 48 endpoints) and a lookup tool — use it instead of guessing paths or schemas, even for endpoints that look obvious.
 ---
 
-# Ozon Seller API
+# Ozon Seller API + Performance API
 
-This skill helps you call the Ozon Seller API (`https://api-seller.ozon.ru`). It bundles the full OpenAPI 3.0 spec from the **official documentation** (`docs.ozon.ru/api/seller/swagger.json`) — 460 operations across ~55 sections.
+This skill helps you call two Ozon APIs, each with its own bundled official OpenAPI 3.0 spec:
 
-The spec is large (~3.7 MB). Don't read it whole — use the helpers described below to pull only what you need.
+- **Seller API** (`https://api-seller.ozon.ru`) — товары, цены, заказы, поставки, отчёты: 460 operations across ~55 sections. Everything below describes it unless said otherwise.
+- **Performance API** (`https://api-performance.ozon.ru`) — реклама: кампании, статистика, ставки: 48 operations across 6 sections. Different host, different credentials, different auth — see [the dedicated section](#ozon-performance-api--реклама) at the end.
+
+The seller spec is large (~3.7 MB). Don't read it whole — use the helpers described below to pull only what you need.
 
 ## Authentication — Client-Id + Api-Key headers
 
@@ -42,6 +45,9 @@ python3 scripts/lookup_endpoint.py search --tag FBS
 # 3) Get full operation details (headers, request/response schemas, deprecation)
 python3 scripts/lookup_endpoint.py show /v3/product/info/list
 python3 scripts/lookup_endpoint.py show /v2/posting/fbs/get --method post
+
+# 4) Read doc-only tag prose (auth walkthroughs, limits) that has no endpoints
+python3 scripts/lookup_endpoint.py tag-info Auth
 ```
 
 `show` resolves top-level `$ref` for readability but leaves nested refs alone — for a deeper schema, read `references/ozon-seller-openapi.json` directly with `jq`:
@@ -122,9 +128,43 @@ When you report an error to the user, include the HTTP status and the full body.
 | Ozon Доставка | 15 | Интеграция «Ozon Доставка» для внешних магазинов (`OrderAPI`, `DeliveryAPI`) — не то же самое, что доставка маркетплейса |
 | Premium-методы | 10 | Расширенная аналитика, ежедневные отчёты о реализации — только с подпиской Premium |
 
+## Ozon Performance API — реклама
+
+A separate API for advertising campaigns. **Don't mix it up with the Seller API**: different host, different credentials, different auth scheme.
+
+**Auth — OAuth2 Client Credentials.** Credentials come from the same cabinet page as seller keys, but a different tab: **seller.ozon.ru → Настройки → API-ключи → вкладка Performance API** — there the user creates a *service account* and gets `client_id` (looks like `XYZ@advertising.performance.ozon.ru`) + `client_secret`. Exchange them for a Bearer token:
+
+```bash
+curl -s -X POST "https://api-performance.ozon.ru/api/client/token" \
+  -H "Content-Type: application/json" \
+  -d "{\"client_id\":\"$OZON_PERF_CLIENT_ID\",\"client_secret\":\"$OZON_PERF_CLIENT_SECRET\",\"grant_type\":\"client_credentials\"}"
+# {"access_token":"...","expires_in":1800,"token_type":"Bearer"}
+```
+
+The token lives **30 minutes** — cache it and refresh on expiry/401. Use it as `Authorization: Bearer <token>` on every call to `https://api-performance.ozon.ru`.
+
+**Lookup** works the same way, with `--api performance`:
+
+```bash
+python3 scripts/lookup_endpoint.py tags --api performance
+python3 scripts/lookup_endpoint.py search статистика --api performance
+python3 scripts/lookup_endpoint.py show /api/client/campaign --api performance
+```
+
+Index: [references/index-performance.md](references/index-performance.md). Sections: Кампании (`Campaign`), Статистика (`Statistics`, 17 — the biggest), Оплата за клик (`Ad`, `Product`), Оплата за заказ (`Search-Promo`), Аналитика внешнего трафика (`Vendor`).
+
+Performance-specific gotchas:
+
+- **Paths already include `/api/client/...`** — append them to the host as-is, don't add prefixes.
+- **Statistics are async**: `POST /api/client/statistics` (or `/statistics/video`, `/statistics/attribution`) returns a `UUID` → poll `GET /api/client/statistics/{UUID}` until ready → download via `GET /api/client/statistics/report?UUID=...`. Response format is CSV for one campaign, ZIP of CSVs for several.
+- **Mixed verbs**: unlike the Seller API, this one uses GET extensively (22 of 48). Check with `show`.
+- **Limits**: 100 000 requests/day total; statistics exports are capped — max 62 days per export, max 10 campaigns per report, **only 1 concurrent export per account** (5 per organisation), daily export quota = активные кампании × 240, но не больше 2000/сутки. One campaign in a request = one export. Full table: `python3 scripts/lookup_endpoint.py tag-info Limits --api performance`.
+- Deprecated methods exist here too (3) — `search`/`show` flag them, but unlike the Seller API their descriptions **don't always name a successor** (e.g. the per-SKU Search-Promo bid methods). Don't guess the replacement — check the section's remaining methods with `search --tag Search-Promo` and confirm the flow with the user.
+- **Doc-only tags** (`Token`, `Limits`, `Intro` here; `Auth`, `Environment` in the Seller spec) have no endpoints — they're prose. Read them with `tag-info`: e.g. `lookup_endpoint.py tag-info Token --api performance` prints the full auth walkthrough.
+
 ## Working with the user
 
 - If the user's request maps to one obvious endpoint, look it up, show them the call you're about to make (URL, headers minus secrets, body), and execute when they confirm.
 - If the request is ambiguous (e.g. "выгрузи остатки" — FBS warehouse stocks? FBO? by-warehouse breakdown?), `search` first and ask which they mean before making calls.
-- When credentials are missing, ask for `OZON_CLIENT_ID` / `OZON_API_KEY` and explain where to get them (seller.ozon.ru → Настройки → Seller API). Don't fabricate test calls without credentials — prepare the curl/python command and let the user run it.
+- When credentials are missing, ask for `OZON_CLIENT_ID` / `OZON_API_KEY` (Seller) or `OZON_PERF_CLIENT_ID` / `OZON_PERF_CLIENT_SECRET` (Performance) and explain where to get them (seller.ozon.ru → Настройки → API-ключи, для рекламы — вкладка Performance API). Don't fabricate test calls without credentials — prepare the curl/python command and let the user run it.
 - Watch out for endpoints that mutate state (товары, цены, остатки, статусы отправлений, отмены). There is no sandbox — confirm with the user before sending; an accidental `/v2/products/stocks` update changes the live store.
