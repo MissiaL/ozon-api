@@ -1,6 +1,6 @@
 ---
 name: ozon-api
-description: Use when the user works with Ozon as a seller or advertiser via API — товары, цены, остатки, отправления FBS/rFBS/FBO, поставки, возвраты, акции, отчёты, финансы, отзывы, чаты, or ad campaigns/statistics/bids (Performance API). Triggers: "Ozon API", "озон апи", "Seller API", "реклама на озоне", api-seller.ozon.ru, api-performance.ozon.ru, docs.ozon.ru/api.
+description: Use when the user works with Ozon as a seller or advertiser via API — товары, цены, остатки, отправления FBS/rFBS/FBO, поставки, возвраты, акции, отчёты, финансы, отзывы, чаты, or ad campaigns/statistics/bids (Performance API). Triggers: "ozon", "озон", "Ozon API", "озон апи", "Seller API", "реклама на озоне", api-seller.ozon.ru, api-performance.ozon.ru, docs.ozon.ru/api.
 ---
 
 # Ozon Seller API + Performance API
