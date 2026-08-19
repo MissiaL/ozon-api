@@ -1,16 +1,16 @@
 ---
 name: ozon-api
-description: Use when the user works with Ozon as a seller or advertiser via API — товары, цены, остатки, отправления FBS/rFBS/FBO, поставки, возвраты, акции, отчёты, финансы, отзывы, чаты, or ad campaigns/statistics/bids (Performance API). Triggers: "ozon", "озон", "Ozon API", "озон апи", "Seller API", "реклама на озоне", api-seller.ozon.ru, api-performance.ozon.ru, docs.ozon.ru/api.
+description: "Use for Ozon Seller API and Ozon Performance API work: товары, цены, остатки, FBS/rFBS/FBO, поставки, возвраты, отчёты, финансы, отзывы, чаты, реклама, кампании, статистика, ставки. Triggers: ozon, озон, Ozon API, озон апи, Seller API, реклама на озоне, api-seller.ozon.ru, api-performance.ozon.ru, docs.ozon.ru/api."
 ---
 
 # Ozon Seller API + Performance API
 
 This skill helps you call two Ozon APIs, each with its own bundled official OpenAPI 3.0 spec:
 
-- **Seller API** (`https://api-seller.ozon.ru`) — товары, цены, заказы, поставки, отчёты: 460 operations across ~55 sections. Everything below describes it unless said otherwise.
+- **Seller API** (`https://api-seller.ozon.ru`) — товары, цены, заказы, поставки, отчёты: 463 operations across 57 sections. Everything below describes it unless said otherwise.
 - **Performance API** (`https://api-performance.ozon.ru`) — реклама: кампании, статистика, ставки: 48 operations across 6 sections. Different host, different credentials, different auth — see [the dedicated section](#ozon-performance-api--реклама) at the end.
 
-The seller spec is large (~3.7 MB). Don't read it whole — use the helpers described below to pull only what you need.
+The seller spec is large (~3.9 MB). Don't read it whole — use the helpers described below to pull only what you need.
 
 ## Authentication — Client-Id + Api-Key headers
 
@@ -70,11 +70,11 @@ curl -s -X POST "https://api-seller.ozon.ru/v3/product/info/list" \
   -H "Content-Type: application/json" \
   -d '{"offer_id": ["АРТИКУЛ-123"]}' | jq .
 
-# example: unprocessed FBS postings (v4 — v3 is deprecated, dies 2026-06-01)
+# example: unprocessed FBS postings (v4 — v3 is deprecated, shuts down 2026-08-31)
 curl -s -X POST "https://api-seller.ozon.ru/v4/posting/fbs/unfulfilled/list" \
   -H "Client-Id: $OZON_CLIENT_ID" -H "Api-Key: $OZON_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"filter":{"cutoff_from":"2026-06-01T00:00:00Z","cutoff_to":"2026-06-14T23:59:59Z"},"limit":100,"sort_dir":"ASC"}' | jq .
+  -d '{"filter":{"cutoff_from":"2026-08-01T00:00:00Z","cutoff_to":"2026-08-14T23:59:59Z"},"limit":100,"sort_dir":"asc"}' | jq .
 ```
 
 For Python, use `requests`/`httpx` with the same two headers. No SDK needed — every endpoint is a plain JSON HTTP call.
@@ -82,7 +82,7 @@ For Python, use `requests`/`httpx` with the same two headers. No SDK needed — 
 ## Conventions and gotchas
 
 - **Base URL** is `https://api-seller.ozon.ru` (no trailing slash). Paths from the spec are appended directly.
-- **Almost everything is POST.** 454 of 460 operations are `POST` with a JSON body — including pure reads ("получить список", "информация о..."). The few `GET`s are file downloads (labels, PDF). Don't assume REST semantics.
+- **Almost everything is POST.** 457 of 463 operations are `POST` with a JSON body — including pure reads ("получить список", "информация о..."). The few `GET`s are file downloads (labels, PDF). Don't assume REST semantics.
 - **Empty body is still a body.** Even when all parameters are optional, send `{}` with `Content-Type: application/json`.
 - **Three product identifiers**, not interchangeable:
   - `offer_id` — артикул продавца (string, your own ID);
@@ -119,12 +119,12 @@ When you report an error to the user, include the HTTP status and the full body.
 
 ## Sections at a glance
 
-~55 sections in 4 groups. Full per-endpoint list is in [references/index.md](references/index.md).
+57 sections in 4 groups. Full per-endpoint list is in [references/index.md](references/index.md).
 
 | Group | # | What's inside |
 |---|---:|---|
-| Базовые методы | 298 | Товары (`ProductAPI`, `CategoryAPI`, `BarcodeAPI`), цены и остатки (`Prices&StocksAPI`), заказы и отправления FBS/rFBS (`FBS`, `DeliveryFBS`, `DeliveryrFBS`, `FBS&rFBSMarks`), поставки FBO (`FboSupplyRequest`, `FBO`), склады (`WarehouseAPI`, `FBSWarehouseSetup`), возвраты (`ReturnsAPI`, `RFBSReturnsAPI`, `ReturnAPI`), отмены, акции (`Promos`), стратегии цен (`PricingStrategyAPI`), сертификаты, отчёты (`ReportAPI`), финансы (`FinanceAPI`), аналитика, рейтинг, чаты, цифровые товары |
-| Бета-методы | 137 | FBP-поставки (черновики/поставки direct, drop-off, pick-up), грузоместа FBS/FBO (`CarriageAPI`, `FBOTransport`), отзывы (`ReviewAPI`), вопросы и ответы, акции продавца (`SellerActions`), пуш-уведомления, кванты |
+| Базовые методы | 312 | Товары (`ProductAPI`, `CategoryAPI`, `BarcodeAPI`), цены и остатки (`Prices&StocksAPI`), заказы и отправления FBS/rFBS (`FBS`, `DeliveryFBS`, `DeliveryrFBS`, `FBS&rFBSMarks`), поставки FBO (`FboSupplyRequest`, `FBO`), склады (`WarehouseAPI`, `FBSWarehouseSetup`), возвраты (`ReturnsAPI`, `RFBSReturnsAPI`, `ReturnAPI`), отмены, акции (`Promos`), стратегии цен (`PricingStrategyAPI`), сертификаты, отчёты (`ReportAPI`), финансы (`FinanceAPI`), аналитика, рейтинг, чаты, цифровые товары |
+| Бета-методы | 126 | FBP-поставки (черновики/поставки direct, drop-off, pick-up), грузоместа FBS/FBO (`CarriageAPI`, `FBOTransport`), отзывы (`ReviewAPI`), вопросы и ответы, акции продавца (`SellerActions`), пуш-уведомления, кванты |
 | Ozon Доставка | 15 | Интеграция «Ozon Доставка» для внешних магазинов (`OrderAPI`, `DeliveryAPI`) — не то же самое, что доставка маркетплейса |
 | Premium-методы | 10 | Расширенная аналитика, ежедневные отчёты о реализации — только с подпиской Premium |
 

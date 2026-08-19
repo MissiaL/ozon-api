@@ -1,45 +1,12 @@
 # Ozon Seller API — индекс категорий
 
-Источник: официальный `docs.ozon.ru/api/seller/swagger.json`. Полный спек: [ozon-seller-openapi.json](./ozon-seller-openapi.json) (~3.7 МБ, 460 путей / 460 операций).
+Источник: официальный `docs.ozon.ru/api/seller/swagger.json`. Полный спек: [ozon-seller-openapi.json](./ozon-seller-openapi.json) (~3.9 МБ, 463 путей / 463 операций).
 
 **Не читай OpenAPI целиком.** Используй `scripts/lookup_endpoint.py` (`tags`/`search`/`show`).
 
 Категории отсортированы по числу эндпоинтов.
 
-## Создание и управление заявками на поставку FBO (`FboSupplyRequest`, 30) — группа «Базовые методы»
-
-- `POST   /v1/cargoes-label/create` — Сгенерировать этикетки для грузомест
-- `GET    /v1/cargoes-label/file/{file_guid}` — Получить PDF с этикетками грузовых мест
-- `POST   /v1/cargoes-label/get` — Получить идентификатор этикетки для грузомест
-- `POST   /v1/cargoes/create` — Установка грузомест
-- `POST   /v1/cargoes/delete` — Удалить грузоместо в заявке на поставку
-- `POST   /v1/cargoes/delete/status` — Информация о статусе удаления грузоместа
-- `POST   /v1/cargoes/get` — Получить информацию о грузоместах
-- `POST   /v1/cargoes/rules/get` — Чек-лист по установке грузомест FBO
-- `POST   /v1/cluster/list` — Информация о кластерах и их складах
-- `POST   /v1/draft/create` — Создать черновик заявки на поставку
-- `POST   /v1/draft/create/info` — Информация о черновике заявки на поставку
-- `POST   /v1/draft/crossdock/create` — Создать черновик заявки на поставку кросс-докингом
-- `POST   /v1/draft/direct/create` — Создать черновик заявки на прямую поставку
-- `POST   /v1/draft/multi-cluster/create` — Создать черновик заявки на поставку для нескольких кластеров
-- `POST   /v1/draft/supply/create` — Создать заявку на поставку по черновику
-- `POST   /v1/draft/supply/create/status` — Информация о создании заявки на поставку
-- `POST   /v1/draft/timeslot/info` — Доступные таймслоты
-- `POST   /v1/supply-order/cancel` — Отменить заявку на поставку
-- `POST   /v1/supply-order/cancel/status` — Получить статус отмены заявки на поставку
-- `POST   /v1/supply-order/content/update` — Редактирование товарного состава
-- `POST   /v1/supply-order/content/update/status` — Информация о статусе редактирования товарного состава
-- `POST   /v1/supply-order/content/update/validation` — Проверить новый товарный состав
-- `POST   /v1/warehouse/fbo/list` — Поиск точек для отгрузки поставки
-- `POST   /v1/warehouse/fbo/seller/list` — Получить список складов продавца
-- `POST   /v2/cargoes/create/info` — Получить информацию по установке грузомест
-- `POST   /v2/cluster/list` — Получить информацию о макролокальных кластерах
-- `POST   /v2/draft/create/info` — Получить информацию о черновике заявки на поставку
-- `POST   /v2/draft/supply/create` — Создать заявку на поставку по черновику
-- `POST   /v2/draft/supply/create/status` — Получить информацию о создании заявки на поставку
-- `POST   /v2/draft/timeslot/info` — Получить список доступных таймслотов
-
-## Доставка FBS (`DeliveryFBS`, 27) — группа «Базовые методы»
+## Доставка FBS (`DeliveryFBS`, 29) — группа «Базовые методы»
 
 - `POST   /v1/assembly/carriage/posting/list` — Получить список отправлений в отгрузке
 - `POST   /v1/assembly/carriage/product/list` — Получить список товаров в отгрузке
@@ -48,6 +15,8 @@
 - `POST   /v1/carriage/act-discrepancy/pdf` — Получить акт о расхождениях по отгрузке FBS
 - `POST   /v1/carriage/approve` — Подтверждение отгрузки
 - `POST   /v1/carriage/cancel` — Удаление отгрузки
+- `POST   /v1/carriage/courier-contact/get` — Получить контактные данные продавца для курьера
+- `POST   /v1/carriage/courier-contact/set` — Добавить или обновить контактные данные продавца для курьера
 - `POST   /v1/carriage/create` — Создание отгрузки
 - `POST   /v1/carriage/delivery/list` — Список методов доставки и отгрузок
 - `POST   /v1/carriage/ettn/status` — Получить статус проверки электронной ТТН на прослеживаемой перевозке FBS
@@ -68,6 +37,34 @@
 - `POST   /v2/posting/fbs/act/list` — Список актов по отгрузкам
 - `POST   /v2/posting/fbs/digital/act/check-status` — Статус формирования накладной ⚠️ deprecated
 - `POST   /v2/posting/fbs/digital/act/get-pdf` — Получить лист отгрузки по перевозке ⚠️ deprecated
+
+## Создание и управление заявками на поставку FBO (`FboSupplyRequest`, 25) — группа «Базовые методы»
+
+- `POST   /v1/cargoes-label/create` — Сгенерировать этикетки для грузомест
+- `GET    /v1/cargoes-label/file/{file_guid}` — Получить PDF с этикетками грузовых мест
+- `POST   /v1/cargoes-label/get` — Получить идентификатор этикетки для грузомест
+- `POST   /v1/cargoes/create` — Установка грузомест
+- `POST   /v1/cargoes/delete` — Удалить грузоместо в заявке на поставку
+- `POST   /v1/cargoes/delete/status` — Информация о статусе удаления грузоместа
+- `POST   /v1/cargoes/get` — Получить информацию о грузоместах
+- `POST   /v1/cargoes/rules/get` — Чек-лист по установке грузомест FBO
+- `POST   /v1/cluster/list` — Информация о кластерах и их складах
+- `POST   /v1/draft/crossdock/create` — Создать черновик заявки на поставку кросс-докингом
+- `POST   /v1/draft/direct/create` — Создать черновик заявки на прямую поставку
+- `POST   /v1/draft/multi-cluster/create` — Создать черновик заявки на поставку для нескольких кластеров
+- `POST   /v1/supply-order/cancel` — Отменить заявку на поставку
+- `POST   /v1/supply-order/cancel/status` — Получить статус отмены заявки на поставку
+- `POST   /v1/supply-order/content/update` — Редактирование товарного состава
+- `POST   /v1/supply-order/content/update/status` — Информация о статусе редактирования товарного состава
+- `POST   /v1/supply-order/content/update/validation` — Проверить новый товарный состав
+- `POST   /v1/warehouse/fbo/list` — Поиск точек для отгрузки поставки
+- `POST   /v1/warehouse/fbo/seller/list` — Получить список складов продавца
+- `POST   /v2/cargoes/create/info` — Получить информацию по установке грузомест
+- `POST   /v2/cluster/list` — Получить информацию о макролокальных кластерах
+- `POST   /v2/draft/create/info` — Получить информацию о черновике заявки на поставку
+- `POST   /v2/draft/supply/create` — Создать заявку на поставку по черновику
+- `POST   /v2/draft/supply/create/status` — Получить информацию о создании заявки на поставку
+- `POST   /v2/draft/timeslot/info` — Получить список доступных таймслотов
 
 ## Обработка заказов FBS и rFBS (`FBS`, 23) — группа «Базовые методы»
 
@@ -95,13 +92,14 @@
 - `POST   /v4/posting/fbs/list` — Получить список отправлений
 - `POST   /v4/posting/fbs/unfulfilled/list` — Получить список необработанных отправлений
 
-## Загрузка и обновление товаров (`ProductAPI`, 19) — группа «Базовые методы»
+## Загрузка и обновление товаров (`ProductAPI`, 20) — группа «Базовые методы»
 
 - `POST   /v1/product/archive` — Перенести товар в архив
 - `POST   /v1/product/attributes/update` — Обновить характеристики товара
 - `POST   /v1/product/import-by-sku` — Создать товар по SKU
 - `POST   /v1/product/import/info` — Узнать статус добавления или обновления товара
 - `POST   /v1/product/info/description` — Получить описание товара
+- `POST   /v1/product/info/stocks-by-warehouse/fbo` — Получить информацию о стоках на складах FBO
 - `POST   /v1/product/info/subscription` — Количество подписавшихся на товар пользователей
 - `POST   /v1/product/info/wrong-volume` — Список товаров с некорректными ОВХ
 - `POST   /v1/product/pictures/import` — Загрузить или обновить изображения товара
@@ -138,6 +136,27 @@
 - `POST   /v1/seller-actions/update/voucher` — Обновить акцию с механикой «Скидка по промокоду»
 - `POST   /v1/seller-actions/voucher/get` — Получить файл с промокодами в формате CSV
 
+## Прочие методы (`BetaMethod`, 18) — группа «Бета-методы»
+
+- `POST   /v1/analytics/manage/stocks` — Управление остатками
+- `POST   /v1/finance/accrual/by-day` — Получить начисления за день
+- `POST   /v1/finance/accrual/postings` — Получить начисления по отправлениям
+- `POST   /v1/finance/accrual/types` — Получить справочник начислений
+- `POST   /v1/finance/balance` — Получить отчёт о балансе
+- `POST   /v1/posting/fbp/get` — Получить информацию об отправлении по идентификатору
+- `POST   /v1/product/stairway-discount/by-quantity/get` — Получить информацию о скидке от количества
+- `POST   /v1/product/stairway-discount/by-quantity/set` — Управлять скидкой от количества
+- `POST   /v1/product/visibility/info` — Получить информацию о видимости товара
+- `POST   /v1/product/visibility/set` — Настроить видимость товара на витрине Ozon и Ozon Селект
+- `POST   /v1/removal/from-stock/list` — Отчёт по вывозу и утилизации со стока FBO
+- `POST   /v1/removal/from-supply/list` — Отчёт по вывозу и утилизации с поставки FBO
+- `POST   /v1/report/realization/posting/create` — Получить позаказный отчёт о реализации товаров
+- `POST   /v2/actions/discounts-task/list` — Получить список заявок на скидку
+- `POST   /v2/posting/digital/list` — Получить список отправлений
+- `POST   /v2/product/certificate/create` — Создать сертификат качества
+- `POST   /v2/product/certification/options` — Получить параметры для создания сертификата качества
+- `POST   /v2/product/certification/params` — Получить обязательные параметры для создания сертификата качества
+
 ## Создание FBS-складов и управление ими (`FBSWarehouseSetup`, 17) — группа «Базовые методы»
 
 - `POST   /v1/warehouse/fbs/create` — Создать склад
@@ -158,7 +177,7 @@
 - `POST   /v1/warehouse/fbs/update/pick-up/timeslot/list` — Получить список таймслотов для обновления склада с отгрузкой pick-up
 - `POST   /v1/warehouse/fbs/update/return-point/list` — Получить список пунктов возврата для обновления склада
 
-## Доставка FBO (`FBO`, 15) — группа «Базовые методы»
+## Доставка FBO (`FBO`, 16) — группа «Базовые методы»
 
 - `POST   /v1/posting/fbo/cancel-reason/list` — Причины отмены отправлений по схеме FBO
 - `GET    /v1/supplier/available_warehouses` — Загруженность складов Ozon
@@ -172,6 +191,7 @@
 - `POST   /v1/supply-order/timeslot/update` — Обновить интервал поставки
 - `POST   /v2/posting/fbo/get` — Информация об отправлении
 - `POST   /v2/posting/fbo/list` — Список отправлений ⚠️ deprecated
+- `POST   /v2/supply-order/timeslot/list` — Получить список доступных интервалов поставки
 - `POST   /v3/posting/fbo/list` — Получить список отправлений
 - `POST   /v3/supply-order/get` — Информация о заявке на поставку
 - `POST   /v3/supply-order/list` — Список заявок на поставку на склад Ozon
@@ -180,7 +200,7 @@
 
 - `GET    /v1/product/certificate/accordance-types` — Список типов соответствия требованиям (версия 1)
 - `POST   /v1/product/certificate/bind` — Привязать сертификат к товару
-- `POST   /v1/product/certificate/create` — Добавить сертификаты для товаров
+- `POST   /v1/product/certificate/create` — Добавить сертификаты для товаров ⚠️ deprecated
 - `POST   /v1/product/certificate/delete` — Удалить сертификат
 - `POST   /v1/product/certificate/info` — Информация о сертификате
 - `POST   /v1/product/certificate/list` — Список сертификатов
@@ -211,22 +231,6 @@
 - `POST   /v2/cargoes/delete/status` — Получить информацию о статусе удаления грузомест и транспортных грузомест
 - `POST   /v2/cargoes/get` — Получить информацию о грузоместах
 
-## Прочие методы (`BetaMethod`, 13) — группа «Бета-методы»
-
-- `POST   /v1/analytics/manage/stocks` — Управление остатками
-- `POST   /v1/finance/accrual/by-day` — Получить начисления за день
-- `POST   /v1/finance/accrual/postings` — Получить начисления по отправлениям
-- `POST   /v1/finance/accrual/types` — Получить справочник начислений
-- `POST   /v1/finance/balance` — Получить отчёт о балансе
-- `POST   /v1/product/stairway-discount/by-quantity/get` — Получить информацию о скидке от количества
-- `POST   /v1/product/stairway-discount/by-quantity/set` — Управлять скидкой от количества
-- `POST   /v1/product/visibility/info` — Получить информацию о видимости товара
-- `POST   /v1/product/visibility/set` — Настроить видимость товара на витрине Ozon и Ozon Селект
-- `POST   /v1/removal/from-stock/list` — Отчёт по вывозу и утилизации со стока FBO
-- `POST   /v1/removal/from-supply/list` — Отчёт по вывозу и утилизации с поставки FBO
-- `POST   /v2/actions/discounts-task/list` — Получить список заявок на скидку
-- `POST   /v2/posting/digital/list` — Получить список отправлений
-
 ## Работа с грузоместами FBS (`CarriageAPI`, 13) — группа «Бета-методы»
 
 - `POST   /v1/carriage/container/approve` — Подтвердить состав грузоместа
@@ -243,7 +247,7 @@
 - `POST   /v1/carriage/container/status/get` — Получить статус грузомест FBS
 - `POST   /v1/carriage/container/task/info` — Получить статус задачи грузового места
 
-## Работа с отзывами (`ReviewAPI`, 12) — группа «Бета-методы»
+## Работа с отзывами (`ReviewAPI`, 12) — группа «Базовые методы»
 
 - `POST   /v1/review/change-status` — Изменить статус отзывов ⚠️ deprecated
 - `POST   /v1/review/comment/create` — Оставить комментарий на отзыв
@@ -389,17 +393,6 @@
 - `POST   /v1/return/giveout/list` — Список возвратных отгрузок
 - `POST   /v1/returns/company/fbs/info` — Количество возвратов FBS
 
-## Возвраты товаров rFBS (`RFBSReturnsAPI`, 8) — группа «Базовые методы»
-
-- `POST   /v1/returns/rfbs/action/set` — Передать доступные действия для rFBS возвратов
-- `POST   /v2/returns/rfbs/compensate` — Вернуть часть стоимости товара
-- `POST   /v2/returns/rfbs/get` — Информация о заявке на возврат
-- `POST   /v2/returns/rfbs/list` — Список заявок на возврат
-- `POST   /v2/returns/rfbs/receive-return` — Подтвердить получение товара на проверку
-- `POST   /v2/returns/rfbs/reject` — Отклонить заявку на возврат
-- `POST   /v2/returns/rfbs/return-money` — Вернуть деньги покупателю
-- `POST   /v2/returns/rfbs/verify` — Одобрить заявку на возврат
-
 ## Работа с FBP-черновиками c доставкой drop-off (`DraftDropOffFBP`, 8) — группа «Бета-методы»
 
 - `POST   /v1/fbp/draft/drop-off/create` — Создать черновик для доставки в drop-off пункт
@@ -411,7 +404,7 @@
 - `POST   /v1/fbp/draft/drop-off/province/list` — Получить список провинций
 - `POST   /v1/fbp/draft/drop-off/registrate` — Перевести черновик в действующую поставку
 
-## Работа с вопросами и ответами (`Questions&Answers`, 8) — группа «Бета-методы»
+## Работа с вопросами и ответами (`Questions&Answers`, 8) — группа «Базовые методы»
 
 - `POST   /v1/question/answer/create` — Создать ответ на вопрос
 - `POST   /v1/question/answer/delete` — Удалить ответ на вопрос
@@ -541,6 +534,13 @@
 - `POST   /v1/fbp/order/direct/timeslot/edit` — Отредактировать таймслот в заявке на поставку
 - `POST   /v1/fbp/order/direct/timeslot/list` — Получить список таймслотов для поставки
 
+## Работа с актами FBO (`SupplyOrderAPI`, 4) — группа «Бета-методы»
+
+- `POST   /v1/supply-order/act/accept` — Согласовать акт
+- `POST   /v1/supply-order/act/accept/status` — Получить статус согласования акта
+- `POST   /v1/supply-order/act/product/get` — Получить информацию о товарах в акте
+- `POST   /v1/supply-order/act/summary/get` — Получить информацию об акте
+
 ## Рейтинг продавца (`SellerRating`, 4) — группа «Базовые методы»
 
 - `POST   /v1/rating/history` — Получить информацию о рейтингах продавца за период
@@ -553,6 +553,12 @@
 - `POST   /v1/analytics/stocks` — Получить аналитику по остаткам
 - `POST   /v1/analytics/turnover/stocks` — Оборачиваемость товара
 - `POST   /v2/analytics/stock_on_warehouses` — Отчёт по остаткам и товарам
+
+## Возвраты товаров rFBS (`RFBSReturnsAPI`, 3) — группа «Базовые методы»
+
+- `POST   /v1/returns/rfbs/action/set` — Передать доступные действия для rFBS возвратов
+- `POST   /v2/returns/rfbs/get` — Информация о заявке на возврат
+- `POST   /v2/returns/rfbs/list` — Список заявок на возврат
 
 ## Отмены заказов (`CancellationAPI`, 3) — группа «Базовые методы»
 

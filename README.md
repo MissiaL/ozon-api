@@ -1,7 +1,7 @@
 # ozon-api — Claude/Agent Skill для Ozon Seller API + Performance API
 
 Skill-репозиторий: полные официальные OpenAPI 3.0 спеки Ozon Seller API
-(460 операций, ~55 разделов) и Ozon Performance API — рекламы (48 операций,
+(463 операции, 57 разделов) и Ozon Performance API — рекламы (48 операций,
 6 разделов) + CLI для навигации по ним.
 
 - [SKILL.md](SKILL.md) — точка входа для агента: авторизация, паттерны вызова, грабли.
@@ -18,7 +18,8 @@ Skill-репозиторий: полные официальные OpenAPI 3.0 с
 
 Спеки пересобираются скриптом из внешней обёртки (`../tools/build_spec.py`).
 docs.ozon.ru за антиботом, поэтому swagger.json надо скачать реальным браузером
-(см. докстринг скрипта), затем:
+(см. докстринг скрипта). Добавляйте cache-buster (`?${Date.now()}`): чистый URL
+может вернуть устаревшую CDN-копию. Затем:
 
 ```bash
 python3 ../tools/build_spec.py --seller-input seller.json --performance-input perf.json
