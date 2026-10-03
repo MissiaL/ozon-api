@@ -1,6 +1,6 @@
 # Ozon Performance API (реклама) — индекс категорий
 
-Источник: официальный `docs.ozon.ru/api/performance/swagger.json`. Полный спек: [ozon-performance-openapi.json](./ozon-performance-openapi.json) (~0.3 МБ, 47 путей / 48 операций).
+Источник: [официальный OpenAPI](https://docs.ozon.ru/api/performance/swagger.json), проверен 2026-10-03. Полный спек: [ozon-performance-openapi.json](./ozon-performance-openapi.json) (47 путей / 48 операций).
 
 **Не читай OpenAPI целиком.** Используй `scripts/lookup_endpoint.py` (`tags`/`search`/`show`).
 
@@ -34,9 +34,9 @@
 - `POST   /api/client/campaign/search_promo/carrots/disable` — Отключить продвижение товаров в акции «Морковск»
 - `POST   /api/client/campaign/search_promo/carrots/enable` — Включить продвижение товаров в акции «Морковск»
 - `POST   /api/client/campaign/search_promo/v2/bids/delete` — Удалить товар из продвижения в оплате за заказ
-- `POST   /api/client/campaign/search_promo/v2/bids/set` — Установить ставку на товар ⚠️ deprecated
+- `POST   /api/client/campaign/search_promo/v2/bids/set` ⚠️ deprecated — Установить ставку на товар
 - `POST   /api/client/campaign/search_promo/v2/products` — Список товаров в продвижении в оплате за заказ
-- `POST   /api/client/search_promo/bids/recommendation` — Рекомендованные ставки для товаров ⚠️ deprecated
+- `POST   /api/client/search_promo/bids/recommendation` ⚠️ deprecated — Рекомендованные ставки для товаров
 - `POST   /api/client/search_promo/get_cpo_min_bids` — Получить фиксированные ставки для товаров
 - `POST   /api/client/search_promo/product/disable` — Отключить продвижение товара в оплате за заказ
 - `POST   /api/client/search_promo/product/enable` — Включить продвижение товара в оплате за заказ
@@ -55,7 +55,7 @@
 - `PATCH  /api/client/campaign/{campaignId}` — Параметры кампании
 - `POST   /api/client/campaign/{campaignId}/activate` — Активировать кампанию
 - `POST   /api/client/campaign/{campaignId}/deactivate` — Выключить кампанию
-- `POST   /external/api/dynamic_budget` — Рассчитать минимальный бюджет кампании ⚠️ deprecated
+- `POST   /external/api/dynamic_budget` ⚠️ deprecated — Рассчитать минимальный бюджет кампании
 
 ## Товары в Оплате за клик (`Product`, 5) — группа «Методы Performance API»
 

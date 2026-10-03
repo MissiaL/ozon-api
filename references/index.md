@@ -1,6 +1,6 @@
 # Ozon Seller API — индекс категорий
 
-Источник: официальный `docs.ozon.ru/api/seller/swagger.json`. Полный спек: [ozon-seller-openapi.json](./ozon-seller-openapi.json) (~3.9 МБ, 463 путей / 463 операций).
+Источник: [официальный OpenAPI](https://docs.ozon.ru/api/seller/swagger.json), проверен 2026-10-03. Полный спек: [ozon-seller-openapi.json](./ozon-seller-openapi.json) (481 путей / 481 операций).
 
 **Не читай OpenAPI целиком.** Используй `scripts/lookup_endpoint.py` (`tags`/`search`/`show`).
 
@@ -35,8 +35,65 @@
 - `POST   /v2/posting/fbs/act/get-pdf` — Получить PDF c документами
 - `POST   /v2/posting/fbs/act/get-postings` — Список отправлений в акте
 - `POST   /v2/posting/fbs/act/list` — Список актов по отгрузкам
-- `POST   /v2/posting/fbs/digital/act/check-status` — Статус формирования накладной ⚠️ deprecated
-- `POST   /v2/posting/fbs/digital/act/get-pdf` — Получить лист отгрузки по перевозке ⚠️ deprecated
+- `POST   /v2/posting/fbs/digital/act/check-status` ⚠️ deprecated — Статус формирования накладной
+- `POST   /v2/posting/fbs/digital/act/get-pdf` ⚠️ deprecated — Получить лист отгрузки по перевозке
+
+## Прочие методы (`BetaMethod`, 26) — группа «Бета-методы»
+
+- `POST   /v1/analytics/category/comparison` — Получить информацию о сравнении категорий
+- `POST   /v1/analytics/decommissioned-goods` — Получить отчёт о списанных товарах
+- `POST   /v1/analytics/local-sale/clusters-items/info` — Получить информацию о локальности продаж по кластерам
+- `POST   /v1/analytics/local-sale/items-clusters/info` — Получить информацию о локальности продаж товара по кластерам
+- `POST   /v1/analytics/local-sale/total` — Получить общую информацию о локальности продаж
+- `POST   /v1/analytics/manage/stocks` — Управление остатками
+- `POST   /v1/description-category/dependent-attributes` — Получить зависимые характеристики
+- `POST   /v1/description-category/dependent-attributes/values` — Получить возможные значения дочерней характеристики
+- `POST   /v1/finance/accrual/by-day` — Получить начисления за день
+- `POST   /v1/finance/accrual/postings` — Получить начисления по отправлениям
+- `POST   /v1/finance/accrual/types` — Получить справочник начислений
+- `POST   /v1/finance/balance` — Получить отчёт о балансе
+- `POST   /v1/posting/fbp/get` — Получить информацию об отправлении по идентификатору
+- `POST   /v1/product/stairway-discount/by-quantity/get` — Получить информацию о скидке от количества
+- `POST   /v1/product/stairway-discount/by-quantity/set` — Управлять скидкой от количества
+- `POST   /v1/product/visibility/info` — Получить информацию о видимости товара
+- `POST   /v1/product/visibility/set` — Настроить видимость товара на витрине Ozon и Ozon Селект
+- `POST   /v1/removal/from-stock/list` — Отчёт по вывозу и утилизации со стока FBO
+- `POST   /v1/removal/from-supply/list` — Отчёт по вывозу и утилизации с поставки FBO
+- `POST   /v1/report/realization/posting/create` — Получить позаказный отчёт о реализации товаров
+- `POST   /v1/warehouse/rfbs/return-point/list` — Получить список пунктов возврата для склада rFBS
+- `POST   /v2/actions/discounts-task/list` — Получить список заявок на скидку
+- `POST   /v2/posting/digital/list` — Получить список отправлений
+- `POST   /v2/product/certificate/create` — Создать сертификат качества
+- `POST   /v2/product/certification/options` — Получить параметры для создания сертификата качества
+- `POST   /v2/product/certification/params` — Получить обязательные параметры для создания сертификата качества
+
+## Обработка заказов FBS и rFBS (`FBS`, 25) — группа «Базовые методы»
+
+- `POST   /v1/posting/fbs/cancel-reason` — Причины отмены отправления
+- `POST   /v1/posting/fbs/package-label/create` — Создать задание на выгрузку этикеток
+- `POST   /v1/posting/fbs/package-label/get` — Получить файл с этикетками
+- `POST   /v1/posting/fbs/pick-up-code/verify` — Проверить код курьера
+- `POST   /v1/posting/fbs/restrictions` — Получить ограничения пункта приёма
+- `POST   /v1/posting/global/etgb` — Таможенные декларации ETGB
+- `POST   /v1/posting/unpaid-legal/product/list` — Список неоплаченных товаров, заказанных юридическими лицами
+- `POST   /v2/posting/fbs/arbitration` — Открыть спор по отправлению
+- `POST   /v2/posting/fbs/awaiting-delivery` — Передать отправление к отгрузке
+- `POST   /v2/posting/fbs/cancel` — Отменить отправление
+- `POST   /v2/posting/fbs/cancel-reason/list` — Причины отмены отправлений
+- `POST   /v2/posting/fbs/get-by-barcode` — Получить информацию об отправлении по штрихкоду
+- `POST   /v2/posting/fbs/package-label` — Напечатать этикетку
+- `POST   /v2/posting/fbs/package-label/create` — Создать задание на формирование этикеток
+- `POST   /v2/posting/fbs/package-label/get` — Получить файл с этикетками
+- `POST   /v2/posting/fbs/product/cancel` — Отменить отправку некоторых товаров в отправлении
+- `POST   /v2/posting/fbs/product/country/list` — Список доступных стран-изготовителей
+- `POST   /v2/posting/fbs/product/country/set` — Добавить информацию о стране-изготовителе товара
+- `POST   /v3/posting/fbs/get` — Получить информацию об отправлении по идентификатору
+- `POST   /v3/posting/fbs/list` ⚠️ deprecated — Список отправлений
+- `POST   /v3/posting/fbs/package-label/create` — Создать задание на формирование этикеток
+- `POST   /v3/posting/fbs/unfulfilled/list` ⚠️ deprecated — Список необработанных отправлений
+- `POST   /v3/posting/multiboxqty/set` — Указать количество коробок для многокоробочных отправлений
+- `POST   /v4/posting/fbs/list` — Получить список отправлений
+- `POST   /v4/posting/fbs/unfulfilled/list` — Получить список необработанных отправлений
 
 ## Создание и управление заявками на поставку FBO (`FboSupplyRequest`, 25) — группа «Базовые методы»
 
@@ -66,33 +123,7 @@
 - `POST   /v2/draft/supply/create/status` — Получить информацию о создании заявки на поставку
 - `POST   /v2/draft/timeslot/info` — Получить список доступных таймслотов
 
-## Обработка заказов FBS и rFBS (`FBS`, 23) — группа «Базовые методы»
-
-- `POST   /v1/posting/fbs/cancel-reason` — Причины отмены отправления
-- `POST   /v1/posting/fbs/package-label/create` — Создать задание на выгрузку этикеток
-- `POST   /v1/posting/fbs/package-label/get` — Получить файл с этикетками
-- `POST   /v1/posting/fbs/pick-up-code/verify` — Проверить код курьера
-- `POST   /v1/posting/fbs/restrictions` — Получить ограничения пункта приёма
-- `POST   /v1/posting/global/etgb` — Таможенные декларации ETGB
-- `POST   /v1/posting/unpaid-legal/product/list` — Список неоплаченных товаров, заказанных юридическими лицами
-- `POST   /v2/posting/fbs/arbitration` — Открыть спор по отправлению
-- `POST   /v2/posting/fbs/awaiting-delivery` — Передать отправление к отгрузке
-- `POST   /v2/posting/fbs/cancel` — Отменить отправление
-- `POST   /v2/posting/fbs/cancel-reason/list` — Причины отмены отправлений
-- `POST   /v2/posting/fbs/get-by-barcode` — Получить информацию об отправлении по штрихкоду
-- `POST   /v2/posting/fbs/package-label` — Напечатать этикетку
-- `POST   /v2/posting/fbs/package-label/create` — Создать задание на формирование этикеток
-- `POST   /v2/posting/fbs/product/cancel` — Отменить отправку некоторых товаров в отправлении
-- `POST   /v2/posting/fbs/product/country/list` — Список доступных стран-изготовителей
-- `POST   /v2/posting/fbs/product/country/set` — Добавить информацию о стране-изготовителе товара
-- `POST   /v3/posting/fbs/get` — Получить информацию об отправлении по идентификатору
-- `POST   /v3/posting/fbs/list` — Список отправлений ⚠️ deprecated
-- `POST   /v3/posting/fbs/unfulfilled/list` — Список необработанных отправлений ⚠️ deprecated
-- `POST   /v3/posting/multiboxqty/set` — Указать количество коробок для многокоробочных отправлений
-- `POST   /v4/posting/fbs/list` — Получить список отправлений
-- `POST   /v4/posting/fbs/unfulfilled/list` — Получить список необработанных отправлений
-
-## Загрузка и обновление товаров (`ProductAPI`, 20) — группа «Базовые методы»
+## Загрузка и обновление товаров (`ProductAPI`, 21) — группа «Базовые методы»
 
 - `POST   /v1/product/archive` — Перенести товар в архив
 - `POST   /v1/product/attributes/update` — Обновить характеристики товара
@@ -102,11 +133,12 @@
 - `POST   /v1/product/info/stocks-by-warehouse/fbo` — Получить информацию о стоках на складах FBO
 - `POST   /v1/product/info/subscription` — Количество подписавшихся на товар пользователей
 - `POST   /v1/product/info/wrong-volume` — Список товаров с некорректными ОВХ
-- `POST   /v1/product/pictures/import` — Загрузить или обновить изображения товара
+- `POST   /v1/product/pictures/import` ⚠️ deprecated — Загрузить или обновить изображения товара
 - `POST   /v1/product/rating-by-sku` — Получить контент-рейтинг товаров по SKU
 - `POST   /v1/product/related-sku/get` — Получить связанные SKU
 - `POST   /v1/product/unarchive` — Вернуть товар из архива
 - `POST   /v1/product/update/offer-id` — Изменить артикулы товаров из системы продавца
+- `POST   /v2/product/pictures/import` — Загрузить или обновить изображения товара
 - `POST   /v2/product/pictures/info` — Получить изображения товаров
 - `POST   /v2/products/delete` — Удалить товар без SKU из архива
 - `POST   /v3/product/import` — Создать или обновить товар
@@ -136,27 +168,6 @@
 - `POST   /v1/seller-actions/update/voucher` — Обновить акцию с механикой «Скидка по промокоду»
 - `POST   /v1/seller-actions/voucher/get` — Получить файл с промокодами в формате CSV
 
-## Прочие методы (`BetaMethod`, 18) — группа «Бета-методы»
-
-- `POST   /v1/analytics/manage/stocks` — Управление остатками
-- `POST   /v1/finance/accrual/by-day` — Получить начисления за день
-- `POST   /v1/finance/accrual/postings` — Получить начисления по отправлениям
-- `POST   /v1/finance/accrual/types` — Получить справочник начислений
-- `POST   /v1/finance/balance` — Получить отчёт о балансе
-- `POST   /v1/posting/fbp/get` — Получить информацию об отправлении по идентификатору
-- `POST   /v1/product/stairway-discount/by-quantity/get` — Получить информацию о скидке от количества
-- `POST   /v1/product/stairway-discount/by-quantity/set` — Управлять скидкой от количества
-- `POST   /v1/product/visibility/info` — Получить информацию о видимости товара
-- `POST   /v1/product/visibility/set` — Настроить видимость товара на витрине Ozon и Ozon Селект
-- `POST   /v1/removal/from-stock/list` — Отчёт по вывозу и утилизации со стока FBO
-- `POST   /v1/removal/from-supply/list` — Отчёт по вывозу и утилизации с поставки FBO
-- `POST   /v1/report/realization/posting/create` — Получить позаказный отчёт о реализации товаров
-- `POST   /v2/actions/discounts-task/list` — Получить список заявок на скидку
-- `POST   /v2/posting/digital/list` — Получить список отправлений
-- `POST   /v2/product/certificate/create` — Создать сертификат качества
-- `POST   /v2/product/certification/options` — Получить параметры для создания сертификата качества
-- `POST   /v2/product/certification/params` — Получить обязательные параметры для создания сертификата качества
-
 ## Создание FBS-складов и управление ими (`FBSWarehouseSetup`, 17) — группа «Базовые методы»
 
 - `POST   /v1/warehouse/fbs/create` — Создать склад
@@ -177,6 +188,25 @@
 - `POST   /v1/warehouse/fbs/update/pick-up/timeslot/list` — Получить список таймслотов для обновления склада с отгрузкой pick-up
 - `POST   /v1/warehouse/fbs/update/return-point/list` — Получить список пунктов возврата для обновления склада
 
+## Акции Ozon (`Promos`, 16) — группа «Базовые методы»
+
+- `GET    /v1/actions` — Список акций
+- `POST   /v1/actions/candidates` ⚠️ deprecated — Список доступных для акции товаров
+- `POST   /v1/actions/discounts-task/approve` — Согласовать заявку на скидку
+- `POST   /v1/actions/discounts-task/decline` — Отклонить заявку на скидку
+- `POST   /v1/actions/discounts-task/list` — Список заявок на скидку
+- `POST   /v1/actions/products` ⚠️ deprecated — Список участвующих в акции товаров
+- `POST   /v1/actions/products/activate` ⚠️ deprecated — Добавить товар в акцию
+- `POST   /v1/actions/products/deactivate` ⚠️ deprecated — Удалить товары из акции
+- `POST   /v1/actions/products/update` — Добавить или обновить товар в акции
+- `POST   /v2/actions/auto-add/products/candidates` — Получить список доступных товаров для автодобавления в акцию
+- `POST   /v2/actions/auto-add/products/delete` — Удалить товары из автодобавления в акцию
+- `POST   /v2/actions/auto-add/products/list` — Получить список товаров из автодобавления в акцию
+- `POST   /v2/actions/auto-add/products/update` — Добавить или обновить товары в автодобавлении в акцию
+- `POST   /v2/actions/candidates` — Получить список товаров, которые могут участвовать в акции
+- `POST   /v2/actions/products` — Получить список товаров, которые участвуют в акции
+- `POST   /v2/actions/products/deactivate` — Удалить товары из акции «Промокоды»
+
 ## Доставка FBO (`FBO`, 16) — группа «Базовые методы»
 
 - `POST   /v1/posting/fbo/cancel-reason/list` — Причины отмены отправлений по схеме FBO
@@ -190,7 +220,7 @@
 - `POST   /v1/supply-order/timeslot/status` — Статус интервала поставки
 - `POST   /v1/supply-order/timeslot/update` — Обновить интервал поставки
 - `POST   /v2/posting/fbo/get` — Информация об отправлении
-- `POST   /v2/posting/fbo/list` — Список отправлений ⚠️ deprecated
+- `POST   /v2/posting/fbo/list` ⚠️ deprecated — Список отправлений
 - `POST   /v2/supply-order/timeslot/list` — Получить список доступных интервалов поставки
 - `POST   /v3/posting/fbo/list` — Получить список отправлений
 - `POST   /v3/supply-order/get` — Информация о заявке на поставку
@@ -200,7 +230,7 @@
 
 - `GET    /v1/product/certificate/accordance-types` — Список типов соответствия требованиям (версия 1)
 - `POST   /v1/product/certificate/bind` — Привязать сертификат к товару
-- `POST   /v1/product/certificate/create` — Добавить сертификаты для товаров ⚠️ deprecated
+- `POST   /v1/product/certificate/create` ⚠️ deprecated — Добавить сертификаты для товаров
 - `POST   /v1/product/certificate/delete` — Удалить сертификат
 - `POST   /v1/product/certificate/info` — Информация о сертификате
 - `POST   /v1/product/certificate/list` — Список сертификатов
@@ -249,13 +279,13 @@
 
 ## Работа с отзывами (`ReviewAPI`, 12) — группа «Базовые методы»
 
-- `POST   /v1/review/change-status` — Изменить статус отзывов ⚠️ deprecated
+- `POST   /v1/review/change-status` ⚠️ deprecated — Изменить статус отзывов
 - `POST   /v1/review/comment/create` — Оставить комментарий на отзыв
-- `POST   /v1/review/comment/delete` — Удалить комментарий на отзыв ⚠️ deprecated
+- `POST   /v1/review/comment/delete` ⚠️ deprecated — Удалить комментарий на отзыв
 - `POST   /v1/review/comment/list` — Получить список комментариев на отзыв
-- `POST   /v1/review/count` — Количество отзывов по статусам ⚠️ deprecated
-- `POST   /v1/review/info` — Получить информацию об отзыве ⚠️ deprecated
-- `POST   /v1/review/list` — Получить список отзывов ⚠️ deprecated
+- `POST   /v1/review/count` ⚠️ deprecated — Количество отзывов по статусам
+- `POST   /v1/review/info` ⚠️ deprecated — Получить информацию об отзыве
+- `POST   /v1/review/list` ⚠️ deprecated — Получить список отзывов
 - `POST   /v2/review/change-status` — Изменить статус отзывов
 - `POST   /v2/review/comment/delete` — Удалить комментарий на отзыв
 - `POST   /v2/review/count` — Получить количество отзывов по статусам
@@ -371,17 +401,6 @@
 - `POST   /v3/finance/transaction/list` — Список транзакций
 - `POST   /v3/finance/transaction/totals` — Суммы транзакций
 
-## Акции Ozon (`Promos`, 8) — группа «Базовые методы»
-
-- `GET    /v1/actions` — Список акций
-- `POST   /v1/actions/candidates` — Список доступных для акции товаров
-- `POST   /v1/actions/discounts-task/approve` — Согласовать заявку на скидку
-- `POST   /v1/actions/discounts-task/decline` — Отклонить заявку на скидку
-- `POST   /v1/actions/discounts-task/list` — Список заявок на скидку
-- `POST   /v1/actions/products` — Список участвующих в акции товаров
-- `POST   /v1/actions/products/activate` — Добавить товар в акцию
-- `POST   /v1/actions/products/deactivate` — Удалить товары из акции
-
 ## Возвратные отгрузки (`ReturnAPI`, 8) — группа «Базовые методы»
 
 - `POST   /v1/return/giveout/barcode` — Значение штрихкода для возвратных отгрузок
@@ -491,6 +510,14 @@
 - `POST   /v1/delivery/point/list` — Получить список точек самовывоза
 - `POST   /v2/delivery/checkout` — Получить доступные варианты доставки
 
+## Работа с FBP-поставками с доставкой direct (`OrderDirectFBP`, 5) — группа «Бета-методы»
+
+- `POST   /v1/fbp/order/direct/cancel` — Отменить поставку
+- `POST   /v1/fbp/order/direct/seller-dlv/edit` — Обновить информацию о доставке силами продавца
+- `POST   /v1/fbp/order/direct/timeslot/edit` — Отредактировать таймслот в заявке на поставку
+- `POST   /v1/fbp/order/direct/timeslot/list` — Получить список таймслотов для поставки
+- `POST   /v1/fbp/order/direct/tpl-dlv/edit` — Обновить информацию о доставке сторонней транспортной компанией
+
 ## Работа с FBP-черновиками с доставкой pick-up (`DraftPickupFBP`, 5) — группа «Бета-методы»
 
 - `POST   /v1/fbp/draft/pick-up/create` — Создать черновик заявки на pick-up поставку
@@ -501,10 +528,10 @@
 
 ## Акции Ozon (`PromosBeta`, 4) — группа «Бета-методы»
 
-- `POST   /v1/actions/auto-add/products/candidates` — Получить список доступных товаров для автодобавления в акцию
-- `POST   /v1/actions/auto-add/products/delete` — Удалить товары из автодобавления в акцию
-- `POST   /v1/actions/auto-add/products/list` — Получить список товаров из автодобавления в акцию
-- `POST   /v1/actions/auto-add/products/update` — Добавить или обновить товары в автодобавлении в акцию
+- `POST   /v1/actions/auto-add/products/candidates` ⚠️ deprecated — Получить список доступных товаров для автодобавления в акцию
+- `POST   /v1/actions/auto-add/products/delete` ⚠️ deprecated — Удалить товары из автодобавления в акцию
+- `POST   /v1/actions/auto-add/products/list` ⚠️ deprecated — Получить список товаров из автодобавления в акцию
+- `POST   /v1/actions/auto-add/products/update` ⚠️ deprecated — Добавить или обновить товары в автодобавлении в акцию
 
 ## Возвраты товаров FBO и FBS (`ReturnsAPI`, 4) — группа «Базовые методы»
 
@@ -526,13 +553,6 @@
 - `POST   /v1/invoice/file/upload` — Загрузка счёта-фактуры
 - `POST   /v2/invoice/create-or-update` — Создать или изменить счёт-фактуру
 - `POST   /v2/invoice/get` — Получить информацию о счёте-фактуре
-
-## Работа с FBP-поставками с доставкой direct (`OrderDirectFBP`, 4) — группа «Бета-методы»
-
-- `POST   /v1/fbp/order/direct/cancel` — Отменить поставку
-- `POST   /v1/fbp/order/direct/seller-dlv/edit` — Обновить информацию о доставке силами продавца
-- `POST   /v1/fbp/order/direct/timeslot/edit` — Отредактировать таймслот в заявке на поставку
-- `POST   /v1/fbp/order/direct/timeslot/list` — Получить список таймслотов для поставки
 
 ## Работа с актами FBO (`SupplyOrderAPI`, 4) — группа «Бета-методы»
 
@@ -593,7 +613,7 @@
 ## Работа с цифровыми товарами (`Digital`, 3) — группа «Базовые методы»
 
 - `POST   /v1/posting/digital/codes/upload` — Загрузить коды цифровых товаров для отправления
-- `POST   /v1/posting/digital/list` — Получить список отправлений ⚠️ deprecated
+- `POST   /v1/posting/digital/list` ⚠️ deprecated — Получить список отправлений
 - `POST   /v1/product/digital/stocks/import` — Обновить количество цифровых товаров
 
 ## Чаты с покупателями (`ChatAPI`, 3) — группа «Базовые методы»
@@ -617,11 +637,6 @@
 
 - `POST   /v1/fbp/order/pick-up/cancel` — Отменить pick-up поставку
 - `POST   /v1/fbp/order/pick-up/dlv/edit` — Изменить данные о точке забора
-
-## Работа с квантами (`Quants`, 2) — группа «Бета-методы»
-
-- `POST   /v1/product/quant/info` — Информация об эконом-товаре
-- `POST   /v1/product/quant/list` — Список эконом-товаров
 
 ## Штрихкоды товаров (`BarcodeAPI`, 2) — группа «Базовые методы»
 

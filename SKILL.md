@@ -7,10 +7,10 @@ description: "Use for Ozon Seller API and Ozon Performance API work: товар�
 
 This skill helps you call two Ozon APIs, each with its own bundled official OpenAPI 3.0 spec:
 
-- **Seller API** (`https://api-seller.ozon.ru`) — товары, цены, заказы, поставки, отчёты: 463 operations across 57 sections. Everything below describes it unless said otherwise.
+- **Seller API** (`https://api-seller.ozon.ru`) — товары, цены, заказы, поставки, отчёты: 481 operations across 56 sections. Everything below describes it unless said otherwise.
 - **Performance API** (`https://api-performance.ozon.ru`) — реклама: кампании, статистика, ставки: 48 operations across 6 sections. Different host, different credentials, different auth — see [the dedicated section](#ozon-performance-api--реклама) at the end.
 
-The seller spec is large (~3.9 MB). Don't read it whole — use the helpers described below to pull only what you need.
+Both official snapshots were fetched on **2026-10-03**. Their `x-source` records the source URL, verification date, and SHA-256 of the downloaded source. These are documentation snapshots; endpoint availability and account permissions still require a live authenticated request. The seller spec is large; use the helpers below to pull only what you need.
 
 ## Authentication — Client-Id + Api-Key headers
 
@@ -23,6 +23,8 @@ Content-Type: application/json
 ```
 
 The user gets both in the Ozon seller cabinet: **seller.ozon.ru → Настройки → Seller API** (`/app/settings/api-keys`). The Client-Id is shown next to the keys list. Keys are shown **only once at creation** and have an access-level role chosen at creation — a read-only key will get `403` on mutating methods.
+
+New Seller API keys expire after **3 months**. Check `expires_at` in `/v1/roles` and arrange replacement before expiry; see `tag-info Auth` or [official authorization docs](https://docs.ozon.ru/api/seller/#tag/Auth).
 
 An alternative **OAuth-token** flow exists (`Authorization: Bearer <token>` instead of the two headers) for Ozon "applications" acting on behalf of sellers — only relevant if the user explicitly works with Ozon apps; see the `OAuth-token` tag description in the spec.
 
@@ -50,7 +52,7 @@ python3 scripts/lookup_endpoint.py show /v2/posting/fbs/get --method post
 python3 scripts/lookup_endpoint.py tag-info Auth
 ```
 
-`show` resolves top-level `$ref` for readability but leaves nested refs alone — for a deeper schema, read `references/ozon-seller-openapi.json` directly with `jq`:
+`show` resolves local `$ref` one level for readability but leaves nested refs alone. External or missing refs remain visible as `$ref`; the official Seller snapshot contains external `rpcStatus.yaml` references in two operations, so their error schemas are not fully bundled. For a deeper schema, read `references/ozon-seller-openapi.json` with `jq`:
 
 ```bash
 jq '.components.schemas | keys[:50]' references/ozon-seller-openapi.json
@@ -70,7 +72,7 @@ curl -s -X POST "https://api-seller.ozon.ru/v3/product/info/list" \
   -H "Content-Type: application/json" \
   -d '{"offer_id": ["АРТИКУЛ-123"]}' | jq .
 
-# example: unprocessed FBS postings (v4 — v3 is deprecated, shuts down 2026-08-31)
+# example: unprocessed FBS postings (v4 — v3 shutdown date has passed)
 curl -s -X POST "https://api-seller.ozon.ru/v4/posting/fbs/unfulfilled/list" \
   -H "Client-Id: $OZON_CLIENT_ID" -H "Api-Key: $OZON_API_KEY" \
   -H "Content-Type: application/json" \
@@ -82,20 +84,20 @@ For Python, use `requests`/`httpx` with the same two headers. No SDK needed — 
 ## Conventions and gotchas
 
 - **Base URL** is `https://api-seller.ozon.ru` (no trailing slash). Paths from the spec are appended directly.
-- **Almost everything is POST.** 457 of 463 operations are `POST` with a JSON body — including pure reads ("получить список", "информация о..."). The few `GET`s are file downloads (labels, PDF). Don't assume REST semantics.
+- **Almost everything is POST.** 475 of 481 operations are `POST` with a JSON body — including pure reads ("получить список", "информация о..."). The few `GET`s are file downloads (labels, PDF). Don't assume REST semantics.
 - **Empty body is still a body.** Even when all parameters are optional, send `{}` with `Content-Type: application/json`.
 - **Three product identifiers**, not interchangeable:
   - `offer_id` — артикул продавца (string, your own ID);
   - `product_id` — internal numeric Ozon ID (returned at import);
   - `sku` — ID карточки на витрине (used in postings/analytics; the SKU in the product URL).
   Methods differ in which they accept — check the request schema with `show` before composing.
-- **Versioning**: `/v1`…`/v5` of the same method coexist. Prefer the highest non-deprecated version; deprecated ones are flagged in `search`/`show` output and in `index.md`, and their `description` names the successor (e.g. `/v3/posting/fbs/list` → «переключитесь на `/v4/posting/fbs/list`») — read it with `show` before picking a replacement.
+- **Versioning**: `/v1`…`/v5` of the same method coexist. Follow the documented successor and compare its schema and behavior. Deprecated ones are flagged in `search`/`show` and the index; read the description for shutdown dates. A path still present in the snapshot may already have been switched off.
 - **Pagination is inconsistent across sections**: products use cursor `last_id` + `limit`; postings use `offset`/`limit` or `cursor`; some reports use `page`/`page_size`. Read the schema, don't assume.
 - **Hard caps live in descriptions**, e.g. «не больше 1000 товаров в одном запросе» for `/v3/product/info/list`. Trust the prose description over schema `maxItems`.
-- **`required` arrays in schemas sometimes lie** — they can list properties that don't exist in `properties` at all (e.g. `quant_size` in the `/v2/products/stocks` request schema). When `required` and `properties`/`example` disagree, trust `properties` and the example.
-- **Rate limits are not in the spec.** Ozon throttles per-method and per-account; `429` means back off with exponential retry. Mass operations (price/stock updates) have documented per-minute caps in method descriptions.
+- **Schema inconsistencies exist.** If `required`, `properties`, examples, or a shutdown notice disagree, consult the current method documentation before composing the request; report unresolved conflicts instead of silently dropping required fields.
+- **Seller rate limits**: unless a method declares its own limit, the default is **50 requests/second per Client ID**. Read `Ratelimit-Remaining` and honor `Retry-After` on `429`; the full rules are in `tag-info Limits` or [official limits docs](https://docs.ozon.ru/api/seller/#tag/Limits). `/v1/analytics/data` allows at most **1 request/minute**, and without Premium Plus/Pro has a **50 requests/day** cap and three-month data window. Retry transient failures with bounded backoff only when the operation can safely be repeated.
 - **Premium-методы** (tag `Premium`: extended analytics, daily realisation reports) require an active Premium subscription; `ReviewAPI` (отзывы) requires the «Управление отзывами» or Premium Pro subscription (each method's description names the required plan). Without it the API returns an access error — that's the subscription, not a bad key.
-- **Бета-методы** group (FBP, отзывы, акции продавца, грузоместа) can change without notice — flag this to the user when relying on them.
+- **Бета-методы** group (FBP, акции продавца, грузоместа) can change without notice — flag this to the user when relying on them.
 - **Dates** are RFC3339 with `Z` (`2026-06-11T00:00:00Z`). Don't pass local time without an offset.
 - **Field naming is snake_case** throughout (`offer_id`, `posting_number`, `cutoff_from`).
 
@@ -115,16 +117,16 @@ Error bodies follow the google.rpc style:
 - `429` — rate limit: back off, retry with exponential backoff.
 - `5xx` — Ozon's side: retry with backoff.
 
-When you report an error to the user, include the HTTP status and the full body.
+When you report an error to the user, include the HTTP status and relevant error body with secrets and private data redacted.
 
 ## Sections at a glance
 
-57 sections in 4 groups. Full per-endpoint list is in [references/index.md](references/index.md).
+56 sections in 4 groups. Full per-endpoint list is in [references/index.md](references/index.md).
 
 | Group | # | What's inside |
 |---|---:|---|
-| Базовые методы | 312 | Товары (`ProductAPI`, `CategoryAPI`, `BarcodeAPI`), цены и остатки (`Prices&StocksAPI`), заказы и отправления FBS/rFBS (`FBS`, `DeliveryFBS`, `DeliveryrFBS`, `FBS&rFBSMarks`), поставки FBO (`FboSupplyRequest`, `FBO`), склады (`WarehouseAPI`, `FBSWarehouseSetup`), возвраты (`ReturnsAPI`, `RFBSReturnsAPI`, `ReturnAPI`), отмены, акции (`Promos`), стратегии цен (`PricingStrategyAPI`), сертификаты, отчёты (`ReportAPI`), финансы (`FinanceAPI`), аналитика, рейтинг, чаты, цифровые товары |
-| Бета-методы | 126 | FBP-поставки (черновики/поставки direct, drop-off, pick-up), грузоместа FBS/FBO (`CarriageAPI`, `FBOTransport`), отзывы (`ReviewAPI`), вопросы и ответы, акции продавца (`SellerActions`), пуш-уведомления, кванты |
+| Базовые методы | 323 | Товары (`ProductAPI`, `CategoryAPI`, `BarcodeAPI`), цены и остатки (`Prices&StocksAPI`), заказы и отправления FBS/rFBS (`FBS`, `DeliveryFBS`, `DeliveryrFBS`, `FBS&rFBSMarks`), поставки FBO (`FboSupplyRequest`, `FBO`), склады (`WarehouseAPI`, `FBSWarehouseSetup`), возвраты (`ReturnsAPI`, `RFBSReturnsAPI`, `ReturnAPI`), отмены, акции (`Promos`), стратегии цен (`PricingStrategyAPI`), сертификаты, отчёты (`ReportAPI`), финансы (`FinanceAPI`), аналитика, рейтинг, чаты, цифровые товары, отзывы, вопросы и ответы |
+| Бета-методы | 133 | FBP-поставки (черновики/поставки direct, drop-off, pick-up), грузоместа FBS/FBO (`CarriageAPI`, `FBOTransport`), акции продавца (`SellerActions`), пуш-уведомления |
 | Ozon Доставка | 15 | Интеграция «Ozon Доставка» для внешних магазинов (`OrderAPI`, `DeliveryAPI`) — не то же самое, что доставка маркетплейса |
 | Premium-методы | 10 | Расширенная аналитика, ежедневные отчёты о реализации — только с подпиской Premium |
 
@@ -141,7 +143,7 @@ curl -s -X POST "https://api-performance.ozon.ru/api/client/token" \
 # {"access_token":"...","expires_in":1800,"token_type":"Bearer"}
 ```
 
-The token lives **30 minutes** — cache it and refresh on expiry/401. Use it as `Authorization: Bearer <token>` on every call to `https://api-performance.ozon.ru`.
+Cache the token for the returned **`expires_in`** seconds (the documented example is 1800), then refresh it on expiry/401. Use it as `Authorization: Bearer <token>` on every call to `https://api-performance.ozon.ru`.
 
 **Lookup** works the same way, with `--api performance`:
 
@@ -164,7 +166,15 @@ Performance-specific gotchas:
 
 ## Working with the user
 
-- If the user's request maps to one obvious endpoint, look it up, show them the call you're about to make (URL, headers minus secrets, body), and execute when they confirm.
+- Look up the operation and execute within the user's authorized scope. An explicit request for a specific read or update already authorizes it; avoid repeated confirmation. Resolve ambiguous targets or unapproved live changes before sending them.
 - If the request is ambiguous (e.g. "выгрузи остатки" — FBS warehouse stocks? FBO? by-warehouse breakdown?), `search` first and ask which they mean before making calls.
-- When credentials are missing, ask for `OZON_CLIENT_ID` / `OZON_API_KEY` (Seller) or `OZON_PERF_CLIENT_ID` / `OZON_PERF_CLIENT_SECRET` (Performance) and explain where to get them (seller.ozon.ru → Настройки → API-ключи, для рекламы — вкладка Performance API). Don't fabricate test calls without credentials — prepare the curl/python command and let the user run it.
-- Watch out for endpoints that mutate state (товары, цены, остатки, статусы отправлений, отмены). There is no sandbox — confirm with the user before sending; an accidental `/v2/products/stocks` update changes the live store.
+- When credentials are missing, ask the user to configure local environment variables `OZON_CLIENT_ID` / `OZON_API_KEY` (Seller) or `OZON_PERF_CLIENT_ID` / `OZON_PERF_CLIENT_SECRET` (Performance), and explain where to get them (seller.ozon.ru → Настройки → API-ключи, для рекламы — вкладка Performance API). Keep secrets out of chat and command output. Without credentials, prepare the call and report that live execution is unverified.
+- For mutations (товары, цены, остатки, статусы отправлений, отмены), check the target, body, and existing authorization immediately before sending. There is no sandbox; an accidental `/v2/products/stocks` update changes the live store.
+
+## Recent migrations to check
+
+For the affected workflows, consult the bundled operation descriptions and [official update notices](https://docs.ozon.ru/api/seller/#tag/News):
+
+- `/v1/product/certificate/products/list`: since 2026-09-28 use `last_id`/`limit`; the official snapshot still lists the retired `page`/`page_size` fields as deprecated.
+- Promotions: `/v2/actions/...` methods change behavior on **2026-10-13**, when the replaced v1 methods are scheduled to stop. Use the documented v2 schema and recheck the rollout notice when migrating.
+- FBS labels: the new `scanit` labels begin on **2026-10-05**. Check `/v3/posting/fbs/package-label/create` and `/v2/posting/fbs/package-label/get` plus the older methods' shutdown notices.

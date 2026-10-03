@@ -44,10 +44,15 @@ def load_spec(api: str) -> dict:
 
 def resolve_ref(spec: dict, ref: str) -> dict:
     # "#/components/schemas/Foo" -> spec["components"]["schemas"]["Foo"]
-    parts = ref.lstrip("#/").split("/")
+    if not ref.startswith("#/"):
+        return {"$ref": ref}
+    parts = ref[2:].split("/")
     node = spec
     for p in parts:
-        node = node.get(p, {})
+        try:
+            node = node[p.replace("~1", "/").replace("~0", "~")]
+        except (KeyError, TypeError):
+            return {"$ref": ref}
     return node
 
 
@@ -121,6 +126,9 @@ def cmd_show(spec: dict, args) -> int:
             print(f"path not found: {args.path}", file=sys.stderr)
             return 2
     methods = spec["paths"][path]
+    if args.method and (args.method.lower() not in ("get", "post", "put", "delete", "patch") or args.method.lower() not in methods):
+        print(f"method not found: {args.method.upper()} {path}", file=sys.stderr)
+        return 2
     # In OpenAPI 3.0, `parameters` may live at the path-item level (shared by all
     # methods of that path) or at the operation level. We merge them so callers
     # see every parameter that applies to a given operation, dedup'd by (name, in).

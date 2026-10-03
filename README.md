@@ -1,8 +1,12 @@
 # ozon-api — Claude/Agent Skill для Ozon Seller API + Performance API
 
 Skill-репозиторий: полные официальные OpenAPI 3.0 спеки Ozon Seller API
-(463 операции, 57 разделов) и Ozon Performance API — рекламы (48 операций,
+(481 операция, 56 разделов) и Ozon Performance API — рекламы (48 операций,
 6 разделов) + CLI для навигации по ним.
+
+Оба официальных снимка проверены 3 октября 2026 года. `x-source` содержит URL,
+дату проверки и SHA-256 скачанного исходника; работоспособность методов с ключом
+продавца этой проверкой не подтверждалась.
 
 - [SKILL.md](SKILL.md) — точка входа для агента: авторизация, паттерны вызова, грабли.
 - [references/ozon-seller-openapi.json](references/ozon-seller-openapi.json) — спек с официального
@@ -16,14 +20,18 @@ Skill-репозиторий: полные официальные OpenAPI 3.0 с
 
 ## Обновление спеков
 
-Спеки пересобираются скриптом из внешней обёртки (`../tools/build_spec.py`).
+Спеки и индексы пересобираются локальным `scripts/build_spec.py`.
 docs.ozon.ru за антиботом, поэтому swagger.json надо скачать реальным браузером
-(см. докстринг скрипта). Добавляйте cache-buster (`?${Date.now()}`): чистый URL
+с официальных страниц Seller API и Performance API. Добавляйте cache-buster (`?${Date.now()}`): чистый URL
 может вернуть устаревшую CDN-копию. Затем:
 
 ```bash
-python3 ../tools/build_spec.py --seller-input seller.json --performance-input perf.json
-python3 ../tools/build_spec.py --only performance --performance-input perf.json
+python3 scripts/build_spec.py --api seller --input seller.json --checked-at 2026-10-03
+python3 scripts/build_spec.py --api performance --input perf.json --checked-at 2026-10-03
+python3 scripts/test_skill.py
 ```
 
-Только stdlib, сети не требует при переданных входных файлах.
+Укажите фактическую дату получения каждой схемы. Скрипт сохраняет исходную
+структуру и добавляет только русские теги, `x-ozon-section` и `x-source`.
+Только stdlib, сети не требует. В Seller-схеме есть внешние ссылки на
+`rpcStatus.yaml`; CLI оставляет их видимыми, но отдельные YAML-файлы не загружает.
